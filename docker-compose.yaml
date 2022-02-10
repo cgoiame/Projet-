@@ -1,0 +1,24 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:11
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=database
+      - POSTGRES_USER=user
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    links:
+      - postgres
+    depends_on:
+      - postgres
+volumes:
+  pgdata:
