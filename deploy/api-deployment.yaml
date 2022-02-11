@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-master
+  namespace: app-api
+  labels:
+    app: api-master
+    tier: backend
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 50%
+  selector:
+    matchLabels:
+      app: api-master
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: api-master
+        tier: backend
+    spec:
+      topologySpreadConstraints:
+        - maxSkew: 2
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app: api-master
+              tier: backend
+      initContainers:
+        - name: check-db-ready
+          image: postgres:9.6.5
+          command: ['sh', '-c', 
+            'until pg_isready -h postgres-master.app-api -p 5432; 
+            do echo waiting for database; sleep 2; done;']
+
+      containers:
+        - name: app
+          image: younes925/application_api:e89ee32
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          resources:
+            limits:
+              cpu: 200m
+            requests:
+              cpu: 50m
+          env:
+          - name: DB_HOST
+            value: "postgres-master.app-api"
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: postgres-credentials
+                key: user
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres-credentials
+                key: password
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: postgres-credentials
+                key: database
+          - name: DB_PORT
+            value: "5432"

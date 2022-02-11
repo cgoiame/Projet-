@@ -1,8 +1,17 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres-master
+  namespace: app-api
+  labels:
+    app: postgres-master
+    tier: backend
 spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-master
+      tier: backend
   template:
     metadata:
       labels:
@@ -10,16 +19,32 @@ spec:
         tier: backend
     spec:
       containers:
-        - name: postgres-master
-          image: postgres:9.6.2
-          ports:
-            - containerPort: 5432
-          env:  # TODO: Use configmap/secrets
-            - name: POSTGRES_PASSWORD
-              value: "password"
-            - name: POSTGRES_DB
-              value: "database"
-            - name: DB_USER
-              value: "user"
-            - name: DB_HOST
-              value: "database"
+      - name: postgres-master
+        image: postgres:9.6.2
+        ports:
+          - containerPort: 5432
+        volumeMounts:
+        - name: postgres-volume-mount
+          mountPath: /var/lib/postgresql/data
+          subPath: postgres
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: user
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: database
+      restartPolicy: Always
+      volumes:
+      - name: postgres-volume-mount
+        persistentVolumeClaim:
+          claimName: postgres-pvc

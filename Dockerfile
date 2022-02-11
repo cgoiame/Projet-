@@ -14,6 +14,6 @@ RUN npm install --legacy-peer-deps
 
 # Bundle app source
 
-EXPOSE 8080
-RUN mv .env.example .env && npm run seed
+EXPOSE 5000
+#RUN mv .env.example .env && npm run seed
 CMD [ "npm", "run", "server:dev" ]

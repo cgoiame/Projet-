@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: app-api
+  labels:
+    app: nginx-master
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-master
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: nginx-master
+        tier: frontend
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.13.0-alpine
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: nginx-cm
