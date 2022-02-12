@@ -39,7 +39,7 @@ spec:
 
       containers:
         - name: app
-          image: younes925/application_api:e89ee32
+          image: cedricgo/application_api:prod
           imagePullPolicy: Always
           ports:
             - containerPort: 5000

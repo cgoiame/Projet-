@@ -16,4 +16,4 @@ RUN npm install --legacy-peer-deps
 
 EXPOSE 5000
 #RUN mv .env.example .env && npm run seed
-CMD [ "npm", "run", "server:dev" ]
+CMD [ "npm", "run", "server:prod" ]
