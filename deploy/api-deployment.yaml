@@ -39,7 +39,7 @@ spec:
 
       containers:
         - name: app
-          image: cedricgo/application_api:prod
+          image: cedricgo/application_api:v2
           imagePullPolicy: Always
           ports:
             - containerPort: 5000

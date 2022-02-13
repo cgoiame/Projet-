@@ -1,5 +1,5 @@
 #!/bin/bash
-GIT_COMMIT=$(git rev-parse --short HEAD)
+GIT_COMMIT="v2"
 # GIT_COMMIT="prod"
 DOCKER_REPO="cedricgo"
 docker build -t application_api:${GIT_COMMIT} -f Dockerfile .
